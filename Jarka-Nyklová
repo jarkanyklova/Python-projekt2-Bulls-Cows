@@ -1,0 +1,108 @@
+import random
+
+cara = "-" * 48
+
+print("Hi there!")
+
+print(cara)
+
+
+# stanovím si hlavní funkci a pomocné funkce pro popis hry a generování náhodného čísla
+def main():
+    print_intro()
+    print(cara)
+
+    play_num = generate_num(4)
+    num_guesses = 0
+
+    # nastavím cyklus hry - vstup kontrolu (délka, číslice, nesmí začínat nulou)
+    # porovnání obou čísel, ukončení hry
+    while True:
+        player_num = input("Enter a number:")
+        num_guesses += 1
+
+        if wrong_input(player_num):
+            continue
+
+        bulls, cows = count_bulls_cows(player_num, play_num)
+
+        if check_game_over(bulls, cows, num_guesses):
+            break
+
+    print(cara)
+
+
+# úvodní představení hry
+def print_intro():
+    print("I've generated a random 4 digit number for you.\nLet's play a bulls and cows game.")
+
+
+# vygenerování náhodného čísla, parametry
+def generate_num(lenght):
+    num = ''
+
+    while len(set(num)) != lenght or num[0] == 0:
+        num = str(random.randint(1000, 9999))
+
+    return num
+
+
+# ověřování vstupu hráče, správné zadání čísel, upozornění hráče
+def wrong_input(inpt):
+    result = False
+
+    if not inpt.isdecimal() or len(inpt) != 4:
+        print("Please enter a whole 4-digit number.")
+        result = True
+
+    if len(set(inpt)) != 4:
+        print("Please enter a number not repeating the digits and cannot beginning with 0.")
+        result = True
+
+    return result
+
+
+# program porovná náhodné číslo se zadaným číslem hráče a vrací počty bulls/cows
+def count_bulls_cows(inpt, secret_num):
+    bulls = cows = 0
+
+    for index, num in enumerate(inpt):
+        if num == secret_num[index]:
+            bulls += 1
+        elif num in secret_num:
+            cows += 1
+
+    return bulls, cows
+
+
+# kontrola hry, když je dosaženo správnosti bulls=4, vyhodnotí hráči výsledek, počet pokusů
+def check_game_over(bulls, cows, num_guesses):
+    status = '{} bulls, {} cows, {} guesses'
+
+    game_over = False
+
+    if bulls == 4:
+        suffix = 'es' if num_guesses > 1 else ''
+        print("Correct, you´ve guessed the right number in %d guess%s!" % (num_guesses, suffix))
+        print(cara)
+        print('That is %s.' % (evaluation(num_guesses)), end='\n')
+        game_over = True
+    else:
+        print(status.format(bulls, cows, num_guesses))
+
+    return game_over
+
+
+# pomocná funkce navíc informuje hráče o výkonu
+def evaluation(guesses):
+    # Vyhodnoceni super výkonu
+    if guesses <= 4: return 'amazing'
+
+    # Vyhodnoceni průměrného výkonu
+    if guesses <= 8: return 'average'
+
+    # Vyhodnoceni horšího výkonu
+    return 'not so good'
+
+
+main()
